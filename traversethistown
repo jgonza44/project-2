@@ -1,0 +1,180 @@
+#include <iostream>
+#include <unordered_set> 
+#include <string> 
+#include <unordered_map>
+#include <algorithm>
+
+
+using namespace std;
+
+struct Node
+{
+  string nodeVal;
+  Node *edge;
+  Node(string nodeVal)
+  {
+    this->nodeVal = nodeVal;
+    edge = nullptr;
+  }
+};
+
+
+class Graph
+{
+  private:
+    unordered_set<Node*> nodeset;	//set of all nodes in the graph 
+    unordered_multimap<Node*,Node*> edges;  
+    Node *head = nullptr;  
+  public: 
+
+  virtual void addNode (string nodeVal) final
+    {  
+      Node *newNode = new Node(nodeVal);
+      nodeset.insert(newNode);
+    }
+
+  virtual  void addUndirectedEdge(Node* first, Node* second) 
+    { //edges.clear();
+    if (first->nodeVal != second->nodeVal)
+      {
+      edges.insert({second,first}); //add nodeval to vector adj list
+      edges.insert({first,second}); // add to destination vector list as well
+      }
+    
+    }
+
+  virtual void removeUndirectedEdge(Node *first, Node *second) final
+    {
+        edges.erase(first);
+        edges.erase(second);
+    }
+
+  virtual void createRandomUnweightedGraphIter(int n)
+    {   nodeset.clear();
+      Graph graph;
+      string c;
+      string d = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      random_shuffle(&d[0],&d[26]);
+      int r;
+
+      for (int i=0; i<n; i++)
+      {      
+          c = d[i] ; // convert char to string
+          addNode(c);
+      }    
+  }  
+
+  virtual void createLinkedList(int n)
+  {   nodeset.clear();
+    Graph graph;
+    
+    string d = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    string c; 
+    random_shuffle(&d[0],&d[26]);
+    int r;
+
+    for (int i=0; i<n; i++)
+    {      
+        c = d[i] ; 
+        if(head == nullptr)
+        head = new Node(c); 
+        else
+        {Node* t = head;
+        while(t->edge) 
+            { 
+             t = t->edge;
+            } t->edge = new Node(c);
+            addUndirectedEdge(t, t->edge);
+            }  
+    }  
+  } 
+
+  unordered_set<Node*>getAllNodes()
+  { 
+    return nodeset; // retrun set of nodes
+  } 
+
+  void printGraph()
+  { 
+    unordered_set<Node*> nodes = getAllNodes();
+    cout<<"Nodes\n";  
+    for(auto itr : nodes) 
+    {
+      cout<< '[' << itr->nodeVal << "] ";
+      cout<<endl;
+    } 
+    while(head)
+    {cout<< '[' <<head->nodeVal<< "] "; cout<<endl;
+    head = head->edge;}    cout<<endl;
+
+    cout<<"Edges\n"; 
+    for(auto it = edges.begin(); it != edges.end(); ++it) 
+    { 
+        cout << it->first->nodeVal << '-' << it->second->nodeVal << '\n'; 
+    } cout<<"END"<< endl;cout<<endl;
+  }
+};
+
+
+int
+main ()
+{
+  Graph graphA;
+
+
+  graphA.addNode("A");
+  graphA.addNode("B");
+  graphA.addNode("C");
+  graphA.addNode("D");
+  graphA.addNode("E");
+
+  unordered_set<Node*> nodes = graphA.getAllNodes();
+
+  auto itr = nodes.begin();
+  auto itr2 = next(nodes.begin(),1);
+  auto itr3 = next(nodes.begin(),2);
+  auto itr4 = next(nodes.begin(),3);
+  auto itr5 = next(nodes.begin(),4);
+  
+  graphA.addUndirectedEdge(*itr, *itr2);
+  graphA.addUndirectedEdge(*itr3, *itr2);
+  graphA.addUndirectedEdge(*itr, *itr4);
+  graphA.addUndirectedEdge(*itr3, *itr4);
+  graphA.addUndirectedEdge(*itr3, *itr5);
+
+    
+  cout<< "Graph A" << endl;
+  graphA.printGraph();
+
+  Graph graphB;
+
+
+  graphB.createRandomUnweightedGraphIter(6);
+  graphB.addUndirectedEdge(*itr, *itr2);
+  graphB.addUndirectedEdge(*itr3, *itr2);
+  graphB.addUndirectedEdge(*itr, *itr4);
+  graphB.addUndirectedEdge(*itr3, *itr4);
+  graphB.addUndirectedEdge(*itr3, *itr5);
+
+  cout<< "Graph B" << endl;
+  graphB.printGraph();
+  
+
+  Graph graphC;
+  cout<< "Graph C" << endl;
+
+  // graphC.createRandomUnweightedGraphIter(6);
+  // graphC.printGraph();
+
+  graphC.createLinkedList(4);
+  
+  //graphC.addUndirectedEdge(*itr3, *itr4);
+  graphC.printGraph();
+
+
+  
+
+  cout << "\nEnd!" << endl;
+
+  return 0;
+}
